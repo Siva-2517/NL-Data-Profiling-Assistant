@@ -21,67 +21,38 @@ A production-grade, full-stack AI application designed to automatically profile 
 The application is structured as a decoupled full-stack system consisting of a Streamlit frontend client, a FastAPI backend server, local vector & relational databases, and a local LLM client:
 
 ```mermaid
-flowchart TB
-    %% Nodes
-    subgraph UI ["Client Layer (Streamlit)"]
-        App["app.py (Web Dashboard)"]
+flowchart TD
+    subgraph Ingestion ["1. Data Ingestion & Profiling Pipeline"]
+        A["CSV Upload (Streamlit UI)"] -->|"Upload"| B["FastAPI Endpoint (datasets.py)"]
+        B -->|"Save File"| C[("Local Storage\n(CSV Files)")]
+        B -->|"Spawn Task"| D["Background Profiler (profiler.py)"]
+        D -->|"Run ydata-profiling"| E["Generate Reports (HTML & JSON)"]
+        E -->|"Extract Stats"| F[("SQLite DB\n(Column Metadata)")]
+        E -->|"Generate Descriptions"| G["Embed Column Summaries"]
+        G -->|"Save Embeddings"| H[("ChromaDB\n(Vector Store)")]
     end
+```
 
-    subgraph API ["Backend API Layer (FastAPI)"]
-        direction TB
-        Main["main.py (App Lifespan)"]
-        Router["router.py (API Routing)"]
-        DS_EP["datasets.py (Endpoints)"]
-        Chat_EP["chat.py (Endpoints)"]
+```mermaid
+flowchart TD
+    subgraph QAFlow ["2. Hybrid RAG Q&A Flow"]
+        User["User Question (Streamlit Chat)"] -->|"POST Request"| ChatEP["FastAPI Endpoint (chat.py)"]
+        ChatEP -->|"Analyze Query"| Router["RAG Engine Router (rag_engine.py)"]
+        
+        Router -->|"Factual Query\n(e.g., mean, nulls, rows)"| Parser["JSON Parser (profiler_parser.py)"]
+        Router -->|"Semantic Query\n(e.g., conceptual questions)"| Chroma["ChromaDB Client (vector_store.py)"]
+        
+        Parser -->|"Retrieve Exact Stats"| Context["Construct Prompt Context"]
+        Chroma -->|"Retrieve Similar Columns"| Context
+        
+        Context -->|"Fetch Memory (Last 3 Rounds)"| SQLite[("SQLite DB\n(Chat History)")]
+        SQLite -->|"Inject History & Context"| LLM["LangChain Ollama Client"]
+        
+        LLM -->|"Predict"| Ollama[("Local Ollama\n(Qwen 2.5)")]
+        Ollama -->|"Save Q&A"| SQLite
+        Ollama -->|"Return JSON Response"| ChatEP
+        ChatEP -->|"Display Text & Citations"| User
     end
-
-    subgraph Services ["Service Layer"]
-        Profiler["profiler.py (ydata-profiling)"]
-        PParser["profiler_parser.py (JSON Parser Cache)"]
-        RAG["rag_engine.py (Hybrid RAG Router)"]
-        VS["vector_store.py (ChromaDB Client)"]
-        LLM["llm_client.py (LangChain Ollama Wrapper)"]
-    end
-
-    subgraph DB ["Data & Persistence Layer"]
-        SQLite[("SQLite (sqlite.db)\n- Column Metadata\n- Chat History\n- Dataset State")]
-        Chroma[("ChromaDB\n(Vector Embeddings)")]
-        Disk[("Local Storage\n- Uploaded CSVs\n- HTML/JSON Profiles")]
-    end
-
-    %% Ingestion Flow
-    App -->|"1. Upload CSV"| DS_EP
-    DS_EP -->|"2. Write File"| Disk
-    DS_EP -->|"3. Start Background Profiler"| Profiler
-    Profiler -->|"4. Save HTML & JSON"| Disk
-    Profiler -->|"5. Extract Stats"| SQLite
-    Profiler -->|"6. Create Summary & Embed"| VS
-    VS -->|"7. Index Metadata"| Chroma
-
-    %% Query / Chat Flow
-    App -->|"8. Send Chat Prompt"| Chat_EP
-    Chat_EP -->|"9. Route & Query"| RAG
-    RAG -->|"10. Keyword Match (Factual)"| PParser
-    RAG -->|"10. Vector Similarity (Semantic)"| VS
-    PParser -->|"Fetch metrics"| Disk
-    VS -->|"Search docs"| Chroma
-    RAG -->|"11. Load Context & Memory"| SQLite
-    RAG -->|"12. Format Prompt & Predict"| LLM
-    LLM -->|"13. Query Ollama"| Ollama[("Local Ollama\n(Qwen 2.5)")]
-    RAG -->|"14. Save Chat History"| SQLite
-    Chat_EP -->|"15. Return Answer & Citations"| App
-
-    %% Styling
-    classDef ui fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
-    classDef api fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
-    classDef svc fill:#fff3e0,stroke:#ef6c00,stroke-width:2px;
-    classDef db fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px;
-    classDef ext fill:#eceff1,stroke:#37474f,stroke-width:2px;
-    class App ui;
-    class Main,Router,DS_EP,Chat_EP api;
-    class Profiler,PParser,RAG,VS,LLM svc;
-    class SQLite,Chroma,Disk db;
-    class Ollama ext;
 ```
 
 ---
