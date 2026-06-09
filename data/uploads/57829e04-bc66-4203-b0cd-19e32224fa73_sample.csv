@@ -1,0 +1,11 @@
+Employee_ID,Name,Age,Department,Salary,Years_At_Company,Satisfaction_Score
+E101,Alice,29,HR,55000,3,4
+E102,Bob,34,Engineering,82000,5,5
+E103,Charlie,,Engineering,95000,7,3
+E104,David,45,Sales,72000,10,2
+E105,Eva,26,Marketing,48000,2,4
+E106,Frank,52,Sales,88000,15,3
+E107,Grace,31,Engineering,79000,4,4
+E108,Henry,41,HR,69000,8,
+E109,Ivy,38,Marketing,62000,6,5
+E110,Jack,47,Engineering,110000,12,4
