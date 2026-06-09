@@ -1,6 +1,6 @@
 # AI-Powered NL Data Profiling Q&A Assistant
 
-A production-grade, full-stack AI application designed to automatically profile CSV datasets, index column metadata, and provide a conversational Q&A interface using a hybrid Retrieval-Augmented Generation (RAG) architecture powered by Ollama and ChromaDB.
+A production-grade, full-stack AI application designed to automatically profile CSV datasets, index column metadata, and provide a conversational Q&A interface using a hybrid Retrieval-Augmented Generation (RAG) architecture powered by Groq API and ChromaDB.
 
 ---
 
@@ -12,7 +12,7 @@ A production-grade, full-stack AI application designed to automatically profile 
 - **Vector Database**: ChromaDB (Semantic column-schema matching)
 - **Relational Database**: SQLite via SQLAlchemy (Persistent datasets, metadata, and Q&A history)
 - **Orchestration**: LangChain
-- **LLM**: Ollama (`qwen2.5:7b-instruct-q4_K_M`)
+- **LLM**: Groq Cloud API (`llama-3.3-70b-versatile`)
 
 ---
 
@@ -46,11 +46,11 @@ flowchart TD
         Chroma -->|"Retrieve Similar Columns"| Context
         
         Context -->|"Fetch Memory (Last 3 Rounds)"| SQLite[("SQLite DB\n(Chat History)")]
-        SQLite -->|"Inject History & Context"| LLM["LangChain Ollama Client"]
+        SQLite -->|"Inject History & Context"| LLM["LangChain Groq Client"]
         
-        LLM -->|"Predict"| Ollama[("Local Ollama\n(Qwen 2.5)")]
-        Ollama -->|"Save Q&A"| SQLite
-        Ollama -->|"Return JSON Response"| ChatEP
+        LLM -->|"Predict"| Groq[("Groq API\n(Llama 3.3)")]
+        Groq -->|"Save Q&A"| SQLite
+        Groq -->|"Return JSON Response"| ChatEP
         ChatEP -->|"Display Text & Citations"| User
     end
 ```
@@ -72,7 +72,7 @@ d:/NLP/
 │   ├── logging_config.py       # Centralized system logger configs
 │   ├── main.py                 # FastAPI application entrypoint and lifespan events
 │   └── services/
-│       ├── llm_client.py       # Ollama LangChain Client wrapper
+│       ├── llm_client.py       # Groq LangChain Client wrapper
 │       ├── profiler.py         # ydata-profiling analytics runner
 │       ├── profiler_parser.py  # JSON statistics parser & caching loader
 │       ├── rag_engine.py       # Router & LangChain Prompt template coordinator
@@ -94,11 +94,7 @@ d:/NLP/
 
 ### 1. Prerequisites
 - **Python 3.10+**
-- **Ollama**: Download and install [Ollama](https://ollama.com/).
-- Pull the instruction model locally:
-  ```bash
-  ollama pull qwen2.5:7b-instruct-q4_K_M
-  ```
+- **Groq API Key**: Get an API Key from the [Groq Console](https://console.groq.com/).
 
 ### 2. Installation Steps
 1. Navigate to the project root directory:
@@ -123,8 +119,8 @@ APP_ENV=development
 LOG_LEVEL=INFO
 DATABASE_URL=sqlite:///./data/sqlite.db
 CHROMA_DB_PATH=./data/chromadb
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=qwen2.5:7b-instruct-q4_K_M
+GROQ_API_KEY=gsk_your_groq_api_key_here
+GROQ_MODEL=llama-3.3-70b-versatile
 UPLOAD_DIR=./data/uploads
 PROFILES_DIR=./data/profiles
 MAX_FILE_SIZE_MB=50
