@@ -249,7 +249,7 @@ class RAGEngine:
             ("human", "{question}")
         ])
 
-        # 5. Build and invoke Chain: prompt template -> ChatOllama LLM client
+        # 5. Build and invoke Chain: prompt template -> ChatGroq LLM client
         chain = prompt_template | self.llm_client.llm
         
         try:

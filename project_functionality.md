@@ -24,7 +24,7 @@ graph TD
     L -->|Semantic Query| N[ChromaDB Similarity Search]
     M --> O[Context Formatter]
     N --> O
-    O --> P[LangChain Ollama Inference]
+    O --> P[LangChain Groq Inference]
     P --> Q[SQLite Chat History Logs]
     P --> R[Streamlit UI Chat Bubble]
 ```
@@ -83,7 +83,7 @@ graph TD
    - It fetches the dataset summary text and the specific column summary details for `Salary` from the cached JSON parser.
 5. **Memory Retrieval**: Pulls the previous interactions from the database to retain conversational context.
 6. **Prompt Assembly**: Merges the retrieved stats context, memory messages, and the user's question into the LangChain Chat template.
-7. **LLM Inference**: The prompt is processed by the local Ollama `qwen2.5:7b` model, returning a structured JSON response.
+7. **LLM Inference**: The prompt is processed by the Groq Cloud API using the Llama-3.3-70b-versatile model, returning a structured JSON response.
 8. **Logging & Return**: The backend logs the QA transaction in the `chat_history` table and returns the response to Streamlit, which displays the text bubble along with citation badges.
 
 ---
@@ -94,4 +94,4 @@ To run smoothly on local environments, the system implements three performance a
 
 - **JSON Parser Caching**: The `ProfilerJSONParser` class implements a class-level dictionary cache indexed by the JSON report file path. The file is only read from disk and parsed once. Subsequent queries fetch the pre-loaded dictionary instantly from memory.
 - **ChromaDB Connection Caching**: The ChromaDB client is shared as a class-level singleton (`_client`), avoiding the disk locks and schema re-loading delay on every query.
-- **LLM Instance Caching**: The `ChatOllama` connection object is stored as a class-level singleton (`_llm`), reusing connection pools and configurations across queries.
+- **LLM Instance Caching**: The `ChatGroq` connection object is stored as a class-level singleton (`_llm`), reusing connection pools and configurations across queries.

@@ -8,7 +8,12 @@ import logging
 import streamlit as st
 import pandas as pd
 import httpx
+import os
+from dotenv import load_dotenv
 from typing import Dict, List, Any
+
+# Load environmental variables locally
+load_dotenv()
 
 # Configure logging for the frontend application
 logging.basicConfig(
@@ -26,7 +31,7 @@ st.set_page_config(
 )
 
 # Backend URL base config
-API_BASE_URL = "http://localhost:8000/api/v1"
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000/api/v1")
 
 def init_session_states():
     """Initialize session variables if they don't exist."""
@@ -289,7 +294,7 @@ def render_chat_tab():
                         "session_id": st.session_state.active_chat_session_id,
                         "message": user_input
                     },
-                    timeout=120.0 # Allow time for Ollama to run locally
+                    timeout=120.0 # Allow time for LLM query execution
                 )
                 if res.status_code == 200:
                     # Refresh history and rerun

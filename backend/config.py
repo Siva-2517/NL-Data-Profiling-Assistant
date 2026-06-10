@@ -21,9 +21,8 @@ class Settings(BaseSettings):
     # Vector Indexes
     CHROMA_DB_PATH: str = "./data/chromadb"
 
-    # Ollama Local Service Configuration (Deprecated)
-    OLLAMA_BASE_URL: str = "http://localhost:11434"
-    OLLAMA_MODEL: str = "qwen2.5:7b-instruct-q4_K_M"
+    # API Configurations
+    API_BASE_URL: str = "http://localhost:8000/api/v1"
 
     # Groq Service Configuration
     GROQ_API_KEY: Optional[str] = None
