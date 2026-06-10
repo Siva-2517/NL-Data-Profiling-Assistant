@@ -3,15 +3,11 @@ Database connection, session management, and generator dependencies.
 Uses SQLAlchemy to link to SQLite DB defined in environmental config.
 """
 
-import os
-from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
+from backend.config import settings
 
-# Load environmental variables locally (if config is not loaded)
-load_dotenv()
-
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./data/sqlite.db")
+DATABASE_URL = settings.DATABASE_URL
 
 # SQLite connection requirements (specifically check for threading parameters)
 connect_args = {}

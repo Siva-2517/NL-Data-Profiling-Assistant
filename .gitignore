@@ -156,3 +156,8 @@ cython_debug/
 *.swo
 *~
 .DS_Store
+*.pyc
+data/chromadb/
+data/uploads/
+data/profiles/
+venv/
