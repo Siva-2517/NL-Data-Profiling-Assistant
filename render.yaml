@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: nlp-backend
+    env: python
+    region: singapore
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    runtime: python-3.11.9
