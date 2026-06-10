@@ -6,7 +6,7 @@ python-multipart>=0.0.9
 
 # Data Processing & Profiling
 pandas>=2.2.0
-ydata-profiling>=4.8.0
+ydata-profiling==4.6.4
 
 # Database & Storage
 sqlalchemy>=2.0.30
